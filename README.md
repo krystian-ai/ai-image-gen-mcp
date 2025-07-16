@@ -1,142 +1,145 @@
-# AI Image‑Gen MCP Server
+# AI Image Generation MCP Server
 
-> **Version 0.1.0 – first public preview**\
-> Conforms to the [Model Context Protocol spec (2025‑06‑18)](https://modelcontextprotocol.io/specification/2025-06-18).
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![MCP](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://modelcontextprotocol.io/)
 
----
+An MCP (Model Context Protocol) server that provides AI image generation capabilities through multiple models including DALL-E 3, DALL-E 2, and GPT-Image-1.
 
-## What’s this?
+## Features
 
-A lightweight **MCP server** that turns cutting‑edge image generators into plug‑and‑play tools for any MCP‑aware client. We start with **GPT‑Image‑1** from OpenAI; next releases will unlock DALL·E, Stable Diffusion and fully local engines – all selectable with a single flag.
+- 🎨 **Multiple AI Models**: Support for DALL-E 3, DALL-E 2, and GPT-Image-1
+- 🚀 **MCP Integration**: Works seamlessly with Claude Desktop and other MCP clients
+- 💾 **Local Storage**: Automatic image storage with metadata tracking
+- 🔧 **Flexible Configuration**: Environment-based configuration
+- ✨ **Rich Prompts**: Built-in prompt templates for common use cases
 
-### Why MCP?
-
-MCP is the USB‑C of AI context: one cable, endless integrations. Ship one binary, hook it into Claude Desktop, VS Code, or your own chatbot, and the host handles UI, permissions and prompt plumbing.
-
-### Quick examples
-
-| You ask                                                       | The server replies                                          |
-| ------------------------------------------------------------- | ----------------------------------------------------------- |
-| *“Give me a slick hero background for my SaaS landing page.”* | Delivers a 3840×2160 PNG + CSS gradient vars                |
-| *“Make that CTA button look like an 18th‑century brick.”*     | Generates a texture sprite and inline styles ready to paste |
-
-If you can phrase it, the pipeline can render it. 💫
-
----
-
-## Core MCP Concepts
-
-This server exposes all three **MCP primitives**:
-
-1. **Tools** – `generate_image`, `upscale_image`, `inpaint_image`
-2. **Resources** – generated assets, prompt logs, experiment metadata
-3. **Prompts** – reusable templates (e.g. *Product Mock‑up*, *Concept Art*)
-
----
-
-## Feature Highlights
-
-- **Model Switcher** – ships with **GPT‑Image‑1**; upcoming releases add DALL·E, Stable Diffusion, and local checkpoints.
-- **Prompt Graphs** – YAML pipelines (txt2img → upscale → watermark).
-- **Versioned Experiments** – hash prompt + seed + params; compare in UI.
-- **Async Queue** – Celery/Kafka keeps GPUs busy but not angry.
-- **RBAC** – per‑team access so interns can’t torch prod.
-
----
-
-## Architecture
-
-```mermaid
-graph TD
-    Host["MCP Client (Claude, IDE, etc.)"] -- JSON‑RPC 2.0 --> Server["Image‑Gen MCP Server"]
-    Server -->|REST / gRPC| Model["GPT‑Image‑1 (today)\nDALL·E / SD (soon)"]
-    Server --> Post[Post‑Processing]
-    Post --> Storage[(Object Storage)]
-    Storage --> Host
-```
-
----
-
-## Quickstart
+## Quick Start
 
 ### Prerequisites
 
-- **Python 3.11+**
-- **Docker 24+** (GPU containers)
-- Optional: **CUDA 12** + nvidia‑docker for local rendering.
+- Python 3.11 or higher
+- OpenAI API key
+- Claude Desktop (for MCP integration)
 
 ### Installation
 
+1. Clone the repository:
 ```bash
 git clone https://github.com/krystian-ai/ai-image-gen-mcp.git
 cd ai-image-gen-mcp
-python -m venv .venv && source .venv/bin/activate
-pip install -e .[image,dev]   # pulls mcp[cli] & diffusers
 ```
 
-### Configuration
-
-Copy `.env.example` → `.env` and set:
-
-```dotenv
-OPENAI_API_KEY=sk-...
-MODEL_DEFAULT=gpt-image-1
-CACHE_DIR=/path/to/cache
-```
-
-### Run (stdio transport)
-
+2. Create and activate virtual environment:
 ```bash
-mcp-imageserve stdio  # or python -m ai_image_gen_mcp.server --transport=stdio
+python3.11 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-### Connect from Claude Desktop
+3. Install dependencies:
+```bash
+pip install -e ".[image,dev]"
+```
 
-```jsonc
+4. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env and add your OpenAI API key
+```
+
+### Claude Desktop Integration
+
+Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
 {
   "mcpServers": {
-    "image-gen": {
-      "command": "mcp-imageserve",
-      "args": ["stdio"],
-      "transport": "STDIO"
+    "ai-image-gen": {
+      "command": "/path/to/ai-image-gen-mcp/.venv/bin/python",
+      "args": ["-m", "ai_image_gen_mcp.server", "stdio"],
+      "transport": "STDIO",
+      "env": {
+        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "your-api-key-here"
+      }
     }
   }
 }
 ```
 
-Restart Claude ➜ `/image` tool appears.
+## Usage
 
----
+### In Claude Desktop
 
-## Roadmap
+After configuration, you can use the image generation tools:
 
-| Version | Focus                                               | Target Date |
-| ------- | --------------------------------------------------- | ----------- |
-| **0.1** | Basic functions, GPT‑Image‑1 support                | 2025‑08‑31  |
-| **0.2** | DALL·E models + model‑mixing config                 | 2025‑09‑30  |
-| **0.3** | Pre‑prompting & style presets for consistent output | 2025‑11‑30  |
-| **0.4** | TBD – community‑driven features 🤔                  | 2026‑01‑30  |
+```
+Generate an image of a serene mountain landscape at sunset
+```
 
----
+Claude will use the `generate_image` tool to create your image.
+
+### Available Models
+
+- **DALL-E 3** (default): Best quality, supports custom sizes and styles
+- **DALL-E 2**: Previous generation, supports batch generation
+- **GPT-Image-1**: Experimental multimodal model
+
+### Prompt Templates
+
+The server includes built-in prompt templates:
+
+- `product_mockup`: Professional product photography prompts
+- `concept_art`: Artistic concept generation prompts
+
+## Development
+
+### Running Tests
+
+```bash
+pytest                    # Run all tests
+pytest --cov             # With coverage
+python test_dalle.py     # Test actual image generation
+```
+
+### Code Quality
+
+```bash
+black src/               # Format code
+ruff check src/         # Lint
+mypy src/               # Type check
+```
+
+## Configuration
+
+Key environment variables:
+
+- `OPENAI_API_KEY`: Your OpenAI API key (required)
+- `MODEL_DEFAULT`: Default model ID (default: gpt-4.1-mini)
+- `MODEL_PROVIDER`: Provider name (default: openai)
+- `CACHE_DIR`: Image storage directory (default: /tmp/ai-image-gen-cache)
+- `LOG_LEVEL`: Logging level (default: INFO)
+
+## Architecture
+
+The server follows a modular architecture:
+
+1. **MCP Server**: FastMCP-based server handling JSON-RPC protocol
+2. **Model Router**: Strategy pattern for model selection
+3. **Storage Layer**: Local filesystem with metadata tracking
+4. **Model Implementations**: Separate classes for each AI model
 
 ## Contributing
 
-Fork → branch → PR. Run `pre-commit` (black, ruff, mypy) before pushing. Document new tools/resources in `docs/`.
-
----
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
 ## License
 
-**Apache 2.0** – see `LICENSE`.
+MIT License - see [LICENSE](LICENSE) for details.
 
----
+## Acknowledgments
 
-## Links
-
-- **MCP Introduction** – [https://modelcontextprotocol.io/introduction](https://modelcontextprotocol.io/introduction)
-- **MCP Quickstart** – [https://modelcontextprotocol.io/quickstart/server](https://modelcontextprotocol.io/quickstart/server)
-- **Spec 2025‑06‑18** – [https://modelcontextprotocol.io/specification/2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18)
-- **OpenAI API Docs** – [https://platform.openai.com/docs](https://platform.openai.com/docs)
-- **Stable Diffusion Web UI** – [https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
-- **OpenAI Image Vision API Docs** - [https://platform.openai.com/docs/guides/images-vision?api-mode=responses](https://platform.openai.com/docs/guides/images-vision?api-mode=responses)
-
+- Built with [FastMCP](https://github.com/jlowin/fastmcp)
+- Uses OpenAI's DALL-E and GPT-Image models
+- Implements the [Model Context Protocol](https://modelcontextprotocol.io/)

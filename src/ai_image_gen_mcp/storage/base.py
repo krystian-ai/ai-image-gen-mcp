@@ -7,7 +7,9 @@ class StorageBackend(ABC):
     """Abstract base class for storage backends."""
 
     @abstractmethod
-    async def save(self, data: bytes, filename: str, metadata: dict | None = None) -> str:
+    async def save(
+        self, data: bytes, filename: str, metadata: dict | None = None
+    ) -> str:
         """Save image data and return accessible URL/path.
 
         Args:

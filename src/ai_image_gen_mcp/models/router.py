@@ -4,8 +4,8 @@ import logging
 from typing import Any
 
 from .base import ImageGenerationModel
-from .gpt_image import GPTImageModel
 from .dalle import DALLEModel
+from .gpt_image import GPTImageModel
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,9 @@ class ModelRouter:
         self.models: dict[str, ImageGenerationModel] = {}
         self.default_model: str | None = None
 
-    def register_model(self, name: str, model: ImageGenerationModel, is_default: bool = False) -> None:
+    def register_model(
+        self, name: str, model: ImageGenerationModel, is_default: bool = False
+    ) -> None:
         """Register a model with the router.
 
         Args:
@@ -48,7 +50,9 @@ class ModelRouter:
             name = self.default_model
 
         if name not in self.models:
-            raise ValueError(f"Model '{name}' not found. Available: {list(self.models.keys())}")
+            raise ValueError(
+                f"Model '{name}' not found. Available: {list(self.models.keys())}"
+            )
 
         return self.models[name]
 
@@ -62,7 +66,7 @@ class ModelRouter:
             {
                 "id": name,
                 "is_default": name == self.default_model,
-                **model.get_model_info()
+                **model.get_model_info(),
             }
             for name, model in self.models.items()
         ]
@@ -82,22 +86,15 @@ class ModelRouter:
         # Register models based on provider
         if config.model_provider == "openai" and config.openai_api_key:
             # Register DALL-E models
-            dalle3 = DALLEModel(
-                api_key=config.openai_api_key,
-                model="dall-e-3"
-            )
+            dalle3 = DALLEModel(api_key=config.openai_api_key, model="dall-e-3")
             router.register_model("dalle-3", dalle3, is_default=True)
-            
-            dalle2 = DALLEModel(
-                api_key=config.openai_api_key,
-                model="dall-e-2"
-            )
+
+            dalle2 = DALLEModel(api_key=config.openai_api_key, model="dall-e-2")
             router.register_model("dalle-2", dalle2)
-            
+
             # Register GPT-Image-1 (but not as default due to timeout issues)
             gpt_image = GPTImageModel(
-                api_key=config.openai_api_key,
-                model=config.model_default
+                api_key=config.openai_api_key, model=config.model_default
             )
             router.register_model("gpt-image-1", gpt_image)
 

@@ -3,8 +3,8 @@
 import base64
 import logging
 from typing import Any
-import httpx
 
+import httpx
 from openai import AsyncOpenAI
 
 from .base import ImageGenerationModel
@@ -32,7 +32,7 @@ class DALLEModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> list[bytes]:
         """Generate images using DALL-E.
 
@@ -63,9 +63,9 @@ class DALLEModel(ImageGenerationModel):
                 "prompt": prompt,
                 "size": size,
                 "n": n,
-                "response_format": "b64_json"  # Get base64 data directly
+                "response_format": "b64_json",  # Get base64 data directly
             }
-            
+
             # Add style for DALL-E 3
             if self.model == "dall-e-3" and style:
                 params["style"] = style
@@ -114,7 +114,7 @@ class DALLEModel(ImageGenerationModel):
                     "supported_styles": ["vivid", "natural"],
                     "supported_n": [1],
                 },
-                "description": "Latest DALL-E model with improved quality and coherence"
+                "description": "Latest DALL-E model with improved quality and coherence",
             }
         else:  # dall-e-2
             return {
@@ -130,7 +130,7 @@ class DALLEModel(ImageGenerationModel):
                     "supported_sizes": ["256x256", "512x512", "1024x1024"],
                     "supported_n": list(range(1, 11)),
                 },
-                "description": "Previous generation DALL-E model"
+                "description": "Previous generation DALL-E model",
             }
 
     async def validate_parameters(
@@ -139,7 +139,7 @@ class DALLEModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> bool:
         """Validate parameters for DALL-E.
 

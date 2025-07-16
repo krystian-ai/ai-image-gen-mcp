@@ -45,7 +45,9 @@ class LocalStorage(StorageBackend):
         # Combine for unique filename
         return f"{timestamp}_{content_hash}{ext}"
 
-    async def save(self, data: bytes, filename: str, metadata: dict | None = None) -> str:
+    async def save(
+        self, data: bytes, filename: str, metadata: dict | None = None
+    ) -> str:
         """Save image data to local filesystem.
 
         Args:
@@ -61,13 +63,13 @@ class LocalStorage(StorageBackend):
         file_path = self.base_path / unique_filename
 
         # Save image data
-        async with aiofiles.open(file_path, 'wb') as f:
+        async with aiofiles.open(file_path, "wb") as f:
             await f.write(data)
 
         # Save metadata if provided
         if metadata:
             metadata_path = file_path.with_suffix(file_path.suffix + ".json")
-            async with aiofiles.open(metadata_path, 'w') as f:
+            async with aiofiles.open(metadata_path, "w") as f:
                 await f.write(json.dumps(metadata, indent=2))
 
         # Return absolute path as string
@@ -87,7 +89,7 @@ class LocalStorage(StorageBackend):
         if not file_path.exists():
             raise FileNotFoundError(f"Image not found: {identifier}")
 
-        async with aiofiles.open(file_path, 'rb') as f:
+        async with aiofiles.open(file_path, "rb") as f:
             return await f.read()
 
     async def delete(self, identifier: str) -> bool:

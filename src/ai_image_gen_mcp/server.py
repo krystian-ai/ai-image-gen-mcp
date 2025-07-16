@@ -14,8 +14,8 @@ from .types import ImageGenerationRequest, ImageGenerationResponse
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    stream=sys.stderr  # Important: MCP servers must not write to stdout
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stderr,  # Important: MCP servers must not write to stdout
 )
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ async def generate_image(
     prompt: str,
     style: str | None = "default",
     size: str | None = "1024x1024",
-    n: int | None = 1
+    n: int | None = 1,
 ) -> ImageGenerationResponse:
     """Generate images from text descriptions using AI models.
 
@@ -50,36 +50,25 @@ async def generate_image(
     logger.info(f"Generating image with prompt: {prompt[:50]}...")
 
     # Validate request
-    request = ImageGenerationRequest(
-        prompt=prompt,
-        style=style,
-        size=size,
-        n=n
-    )
+    request = ImageGenerationRequest(prompt=prompt, style=style, size=size, n=n)
 
     # Get model (use default for now)
     model = model_router.get_model()
 
     # Validate parameters for the model
     if not await model.validate_parameters(
-        prompt=request.prompt,
-        size=request.size,
-        style=request.style,
-        n=request.n
+        prompt=request.prompt, size=request.size, style=request.style, n=request.n
     ):
         raise ValueError("Invalid parameters for selected model")
 
     # Generate images
     try:
         image_data_list = await model.generate(
-            prompt=request.prompt,
-            size=request.size,
-            style=request.style,
-            n=request.n
+            prompt=request.prompt, size=request.size, style=request.style, n=request.n
         )
     except Exception as e:
         logger.error(f"Model generation failed: {e}")
-        raise RuntimeError(f"Image generation failed: {str(e)}")
+        raise RuntimeError(f"Image generation failed: {str(e)}") from e
 
     # Save images to storage
     image_urls = []
@@ -90,7 +79,7 @@ async def generate_image(
             "style": request.style,
             "size": request.size,
             "model": model.get_model_info()["model_id"],
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": datetime.utcnow().isoformat(),
         }
 
         try:
@@ -98,14 +87,14 @@ async def generate_image(
             image_urls.append(url)
         except Exception as e:
             logger.error(f"Storage save failed: {e}")
-            raise RuntimeError(f"Failed to save image: {str(e)}")
+            raise RuntimeError(f"Failed to save image: {str(e)}") from e
 
     # Return response
     response = ImageGenerationResponse(
         image_urls=image_urls,
         prompt=request.prompt,
         model=model.get_model_info()["model_id"],
-        created_at=datetime.utcnow().isoformat()
+        created_at=datetime.utcnow().isoformat(),
     )
 
     logger.info(f"Successfully generated {len(image_urls)} image(s)")
@@ -119,17 +108,12 @@ async def list_models() -> dict:
     Returns:
         Dictionary containing available models and their capabilities
     """
-    return {
-        "models": model_router.list_models(),
-        "default": model_router.default_model
-    }
+    return {"models": model_router.list_models(), "default": model_router.default_model}
 
 
 @mcp.prompt()
 async def product_mockup(
-    product_name: str,
-    style: str = "photorealistic",
-    background: str = "white studio"
+    product_name: str, style: str = "photorealistic", background: str = "white studio"
 ) -> str:
     """Generate a product mockup prompt.
 
@@ -146,9 +130,7 @@ async def product_mockup(
 
 @mcp.prompt()
 async def concept_art(
-    subject: str,
-    art_style: str = "digital painting",
-    mood: str = "dramatic"
+    subject: str, art_style: str = "digital painting", mood: str = "dramatic"
 ) -> str:
     """Generate a concept art prompt.
 
@@ -182,7 +164,9 @@ def main() -> None:
 
     # Create model router
     model_router = ModelRouter.create_default_router(config)
-    logger.info(f"Model router initialized with models: {list(model_router.models.keys())}")
+    logger.info(
+        f"Model router initialized with models: {list(model_router.models.keys())}"
+    )
 
     # Run the server
     transport = sys.argv[1] if len(sys.argv) > 1 else "stdio"

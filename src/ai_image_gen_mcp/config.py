@@ -11,58 +11,38 @@ class Config(BaseModel):
     """Server configuration."""
 
     # OpenAI Configuration
-    openai_api_key: str = Field(
-        ...,
-        description="OpenAI API key for GPT-Image-1"
-    )
+    openai_api_key: str = Field(..., description="OpenAI API key for GPT-Image-1")
 
     # Model Configuration
     model_default: str = Field(
-        default="gpt-4.1-mini",
-        description="Default model to use"
+        default="gpt-4.1-mini", description="Default model to use"
     )
-    model_provider: str = Field(
-        default="openai",
-        description="Model provider"
-    )
+    model_provider: str = Field(default="openai", description="Model provider")
 
     # Storage Configuration
     cache_dir: Path = Field(
         default=Path("/tmp/ai-image-gen-cache"),
-        description="Directory for storing generated images"
+        description="Directory for storing generated images",
     )
-    storage_type: str = Field(
-        default="local",
-        description="Storage backend type"
-    )
+    storage_type: str = Field(default="local", description="Storage backend type")
 
     # Server Configuration
     server_name: str = Field(
         default="AI Image Generation MCP Server",
-        description="Server name for identification"
+        description="Server name for identification",
     )
-    server_version: str = Field(
-        default="0.1.0",
-        description="Server version"
-    )
+    server_version: str = Field(default="0.1.0", description="Server version")
 
     # Logging
-    log_level: str = Field(
-        default="INFO",
-        description="Logging level"
-    )
+    log_level: str = Field(default="INFO", description="Logging level")
 
     # Rate Limiting
     rate_limit_rpm: int = Field(
-        default=60,
-        description="Rate limit in requests per minute"
+        default=60, description="Rate limit in requests per minute"
     )
 
     # Development
-    debug: bool = Field(
-        default=False,
-        description="Debug mode"
-    )
+    debug: bool = Field(default=False, description="Debug mode")
 
     @field_validator("cache_dir", mode="before")
     def expand_cache_dir(cls, v):
@@ -78,10 +58,7 @@ class Config(BaseModel):
             raise ValueError("Invalid OpenAI API key format")
         return v
 
-    model_config = ConfigDict(
-        case_sensitive=False,
-        env_prefix=""
-    )
+    model_config = ConfigDict(case_sensitive=False, env_prefix="")
 
 
 def load_config(env_file: Path | None = None) -> Config:

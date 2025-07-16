@@ -30,7 +30,7 @@ class GPTImageModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> list[bytes]:
         """Generate images using GPT-Image-1.
 
@@ -54,19 +54,19 @@ class GPTImageModel(ImageGenerationModel):
                 model=self.model,
                 input=prompt,
                 tools=[{"type": "image_generation"}],
-                tool_choice={"type": "image_generation"}
+                tool_choice={"type": "image_generation"},
             )
 
             # Extract image data from response
             if not response.output or len(response.output) == 0:
                 raise ValueError("No output in response")
-            
+
             # Get the image data from the first output
             # The output is an ImageGenerationCall with a result field containing base64 data
             first_output = response.output[0]
-            if not hasattr(first_output, 'result'):
+            if not hasattr(first_output, "result"):
                 raise ValueError("No image result in response")
-            
+
             image_outputs = [first_output.result]
 
             # Convert base64 to bytes
@@ -101,7 +101,7 @@ class GPTImageModel(ImageGenerationModel):
                 "supports_size": False,
                 "supports_style": False,
             },
-            "description": "Natively multimodal LLM with image generation capabilities"
+            "description": "Natively multimodal LLM with image generation capabilities",
         }
 
     async def validate_parameters(
@@ -110,7 +110,7 @@ class GPTImageModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> bool:
         """Validate parameters for GPT-Image-1.
 

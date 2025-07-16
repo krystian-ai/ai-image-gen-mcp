@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "ai-image-gen": {
+      "command": "/path/to/ai-image-gen-mcp/.venv/bin/python",
+      "args": [
+        "-m",
+        "ai_image_gen_mcp.server",
+        "stdio"
+      ],
+      "transport": "STDIO",
+      "env": {
+        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "sk-your-openai-api-key-here"
+      }
+    }
+  }
+}

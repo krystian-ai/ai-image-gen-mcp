@@ -158,3 +158,13 @@ logs/
 
 # MCP specific
 mcp_session_*
+
+# Claude Desktop config (user-specific)
+claude_desktop_config.json
+
+# Poetry lock file (for public repos, let users generate their own)
+poetry.lock
+
+# Local test scripts
+test_*.py
+!tests/test_*.py

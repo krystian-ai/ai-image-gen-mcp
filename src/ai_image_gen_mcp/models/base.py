@@ -14,7 +14,7 @@ class ImageGenerationModel(ABC):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> list[bytes]:
         """Generate images based on prompt.
 
@@ -46,7 +46,7 @@ class ImageGenerationModel(ABC):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs
+        **kwargs,
     ) -> bool:
         """Validate generation parameters for this model.
 
