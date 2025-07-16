@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "ai-image-gen": {
-      "command": "python",
+      "command": "/Users/kkaczynski/Sources/projects-ai/ai-image-gen-mcp/.venv/bin/python",
       "args": [
         "-m",
         "ai_image_gen_mcp.server",
@@ -9,7 +9,8 @@
       ],
       "transport": "STDIO",
       "env": {
-        "PYTHONPATH": "/Users/kkaczynski/Sources/projects-ai/ai-image-gen-mcp/src"
+        "PYTHONPATH": "/Users/kkaczynski/Sources/projects-ai/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "YOUR_API_KEY_HERE"
       }
     }
   }

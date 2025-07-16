@@ -5,6 +5,7 @@ from typing import Any
 
 from .base import ImageGenerationModel
 from .gpt_image import GPTImageModel
+from .dalle import DALLEModel
 
 logger = logging.getLogger(__name__)
 
@@ -78,16 +79,26 @@ class ModelRouter:
         """
         router = cls()
 
-        # Register GPT-Image-1
+        # Register models based on provider
         if config.model_provider == "openai" and config.openai_api_key:
+            # Register DALL-E models
+            dalle3 = DALLEModel(
+                api_key=config.openai_api_key,
+                model="dall-e-3"
+            )
+            router.register_model("dalle-3", dalle3, is_default=True)
+            
+            dalle2 = DALLEModel(
+                api_key=config.openai_api_key,
+                model="dall-e-2"
+            )
+            router.register_model("dalle-2", dalle2)
+            
+            # Register GPT-Image-1 (but not as default due to timeout issues)
             gpt_image = GPTImageModel(
                 api_key=config.openai_api_key,
                 model=config.model_default
             )
-            router.register_model("gpt-image-1", gpt_image, is_default=True)
-
-        # Future: Add more models here
-        # router.register_model("dalle-3", DallE3Model(...))
-        # router.register_model("stable-diffusion", StableDiffusionModel(...))
+            router.register_model("gpt-image-1", gpt_image)
 
         return router

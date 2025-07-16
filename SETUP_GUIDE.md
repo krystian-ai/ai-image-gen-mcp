@@ -71,12 +71,12 @@ After installation, add to your Claude Desktop config:
 
 ### Option 2: Development mode
 
-For development, use the full path:
+For development, use the full path to your virtual environment:
 ```json
 {
   "mcpServers": {
     "ai-image-gen": {
-      "command": "/path/to/your/venv/bin/python",
+      "command": "/path/to/ai-image-gen-mcp/.venv/bin/python",
       "args": [
         "-m",
         "ai_image_gen_mcp.server",
@@ -84,12 +84,15 @@ For development, use the full path:
       ],
       "transport": "STDIO",
       "env": {
-        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src"
+        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "your-api-key-here"
       }
     }
   }
 }
 ```
+
+Note: Replace `/path/to/ai-image-gen-mcp` with your actual project path and add your OpenAI API key.
 
 ### Claude Desktop Config Location
 

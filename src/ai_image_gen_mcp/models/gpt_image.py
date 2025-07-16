@@ -54,17 +54,20 @@ class GPTImageModel(ImageGenerationModel):
                 model=self.model,
                 input=prompt,
                 tools=[{"type": "image_generation"}],
+                tool_choice={"type": "image_generation"}
             )
 
             # Extract image data from response
-            image_outputs = [
-                output.result
-                for output in response.output
-                if output.type == "image_generation_call"
-            ]
-
-            if not image_outputs:
-                raise ValueError("No image generated in response")
+            if not response.output or len(response.output) == 0:
+                raise ValueError("No output in response")
+            
+            # Get the image data from the first output
+            # The output is an ImageGenerationCall with a result field containing base64 data
+            first_output = response.output[0]
+            if not hasattr(first_output, 'result'):
+                raise ValueError("No image result in response")
+            
+            image_outputs = [first_output.result]
 
             # Convert base64 to bytes
             image_data_list = []
