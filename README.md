@@ -1,7 +1,8 @@
 # AI Image Generation MCP Server
 
 <p align="center">
-  <img src="assets/logo.png" alt="AI Image Generation MCP Server Logo" width="400">
+  <img src="assets/logo.png" alt="AI Image Generation MCP Server Logo (DALL-E 3)" width="400">
+  <img src="assets/logo-gpt.png" alt="AI Image Generation MCP Server Logo (GPT-Image-1)" width="400">
 </p>
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)

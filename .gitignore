@@ -141,6 +141,7 @@ Thumbs.db
 *.jpeg
 *.webp
 !docs/images/*
+!assets/*
 
 # Temporary files
 *.tmp
