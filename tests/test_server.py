@@ -17,10 +17,10 @@ async def test_generate_image_success():
         mock_model = AsyncMock()
         mock_model.validate_parameters.return_value = True
         mock_model.generate.return_value = [b'fake_image_data']
-        mock_model.get_model_info.return_value = {"model_id": "gpt-4.1-mini"}
+        mock_model.get_model_info = Mock(return_value={"model_id": "gpt-4.1-mini"})
         
         mock_router.get_model.return_value = mock_model
-        mock_storage.save.return_value = "/tmp/generated_0.png"
+        mock_storage.save = AsyncMock(return_value="/tmp/generated_0.png")
         
         # Call function
         response = await generate_image(
@@ -41,15 +41,11 @@ async def test_generate_image_success():
 @pytest.mark.asyncio
 async def test_generate_image_invalid_parameters():
     """Test image generation with invalid parameters."""
-    with patch('ai_image_gen_mcp.server.model_router') as mock_router:
-        # Setup mock
-        mock_model = AsyncMock()
-        mock_model.validate_parameters.return_value = False
-        mock_router.get_model.return_value = mock_model
-        
-        # Should raise ValueError
-        with pytest.raises(ValueError, match="Invalid parameters"):
-            await generate_image(
-                prompt="Test",
-                n=5  # Invalid for GPT-Image-1
-            )
+    # Test Pydantic validation error for n > 1
+    from pydantic import ValidationError
+    
+    with pytest.raises(ValidationError):
+        await generate_image(
+            prompt="Test",
+            n=5  # Invalid for GPT-Image-1
+        )

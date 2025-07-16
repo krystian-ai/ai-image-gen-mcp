@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ai-image-gen": {
+      "command": "python",
+      "args": [
+        "-m",
+        "ai_image_gen_mcp.server",
+        "stdio"
+      ],
+      "transport": "STDIO",
+      "env": {
+        "PYTHONPATH": "/Users/kkaczynski/Sources/projects-ai/ai-image-gen-mcp/src"
+      }
+    }
+  }
+}
