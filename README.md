@@ -138,4 +138,5 @@ Fork → branch → PR. Run `pre-commit` (black, ruff, mypy) before pushing. Doc
 - **Spec 2025‑06‑18** – [https://modelcontextprotocol.io/specification/2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18)
 - **OpenAI API Docs** – [https://platform.openai.com/docs](https://platform.openai.com/docs)
 - **Stable Diffusion Web UI** – [https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)
+- **OpenAI Image Vision API Docs** - [https://platform.openai.com/docs/guides/images-vision?api-mode=responses](https://platform.openai.com/docs/guides/images-vision?api-mode=responses)
 

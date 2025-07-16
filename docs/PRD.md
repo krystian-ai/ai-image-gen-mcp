@@ -131,5 +131,5 @@ Minimum set to launch Beta:
 
 ---
 
-© 2025 AI‑Infra Team – Confidential
+© 2025 Krystian-AI – Confidential
 
