@@ -1,4 +1,7 @@
-# AI Image Generation MCP Server
+# AI Image‑Gen MCP Server
+
+> **Version 0.1.0 – MVP public release**  
+> Conforms to the [Model Context Protocol spec (2025‑06‑18)](https://modelcontextprotocol.io/specification/2025-06-18).
 
 <p align="center">
   <img src="assets/logo.png" alt="AI Image Generation MCP Server Logo (DALL-E 3)" width="400">
@@ -10,52 +13,110 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://modelcontextprotocol.io/)
 
-An MCP (Model Context Protocol) server that provides AI image generation capabilities through multiple models including DALL-E 3, DALL-E 2, and GPT-Image-1.
+---
 
-## Features
+## What's this?
 
-- 🎨 **Multiple AI Models**: Support for DALL-E 3, DALL-E 2, and GPT-Image-1
-- 🚀 **MCP Integration**: Works seamlessly with Claude Desktop and other MCP clients
-- 💾 **Local Storage**: Automatic image storage with metadata tracking
-- 🔧 **Flexible Configuration**: Environment-based configuration
-- ✨ **Rich Prompts**: Built-in prompt templates for common use cases
+A production‑ready **MCP server** that transforms state‑of‑the‑art image generators into plug‑and‑play tools for any MCP‑aware client. Currently shipping with **DALL·E 3**, **DALL·E 2**, and experimental **GPT‑Image‑1** – all accessible through a unified interface.
 
-## Quick Start
+### Why MCP?
+
+MCP is the USB‑C of AI context: one protocol, endless integrations. Ship one server, hook it into Claude Desktop, Claude Code, VS Code, or your own chatbot – the host handles UI, auth, and conversation flow.
+
+### Quick examples
+
+| You ask                                                       | The server delivers                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------- |
+| *"Design a cyberpunk logo for my startup"*                   | High‑res PNG via DALL·E 3 with style presets               |
+| *"Generate 5 variations of this product shot"*               | Batch generation via DALL·E 2 (n=5 support)                |
+| *"Create concept art for a steampunk airship"*              | Artistic rendering with metadata and prompt history         |
+
+If you can describe it, we can render it. 💫
+
+---
+
+## Core MCP Concepts
+
+This server implements all three **MCP primitives**:
+
+1. **Tools** – `generate_image` with model selection, size, and style options
+2. **Resources** – Available models and their capabilities exposed as MCP resources
+3. **Prompts** – Built‑in templates for `product_mockup` and `concept_art` workflows
+
+---
+
+## Feature Highlights
+
+* **Multi‑Model Support** – **DALL·E 3** (default), **DALL·E 2**, and **GPT‑Image‑1** via unified API
+* **Smart Storage** – Local cache with timestamped filenames and JSON metadata
+* **Flexible Sizing** – From 256×256 thumbnails to 1792×1024 widescreen masterpieces
+* **Style Control** – `vivid` or `natural` rendering (DALL·E 3)
+* **Batch Generation** – Create up to 10 variations per prompt (DALL·E 2)
+* **Claude Integration** – First‑class support for Desktop and Code editions
+
+---
+
+## Architecture
+
+```mermaid
+graph TD
+    Client["MCP Client (Claude Desktop/Code)"] -- JSON‑RPC 2.0 --> Server["Image‑Gen MCP Server"]
+    Server --> Router["Model Router"]
+    Router -->|OpenAI API| DALLE3["DALL·E 3"]
+    Router -->|OpenAI API| DALLE2["DALL·E 2"]
+    Router -->|Responses API| GPT["GPT‑Image‑1"]
+    Server --> Storage["Local Storage + Metadata"]
+    Storage --> Client
+```
+
+---
+
+## Quickstart
 
 ### Prerequisites
 
-- Python 3.11 or higher
-- OpenAI API key
-- Claude Desktop (for MCP integration)
+* **Python 3.11+**
+* **OpenAI API key**
+* **Claude Desktop** or **Claude Code** (for MCP integration)
 
 ### Installation
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/krystian-ai/ai-image-gen-mcp.git
 cd ai-image-gen-mcp
-```
-
-2. Create and activate virtual environment:
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
+python3.11 -m venv .venv && source .venv/bin/activate
 pip install -e ".[image,dev]"
 ```
 
-4. Configure environment:
+### Configuration
+
 ```bash
 cp .env.example .env
 # Edit .env and add your OpenAI API key
 ```
 
-### Claude Desktop Integration
+Key settings:
+```dotenv
+OPENAI_API_KEY=sk-...
+MODEL_DEFAULT=dall-e-3
+CACHE_DIR=/tmp/ai-image-gen-cache
+```
 
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+### Run Standalone
+
+```bash
+# Via MCP CLI
+mcp-imageserve stdio
+
+# Direct execution
+python -m ai_image_gen_mcp.server --transport=stdio
+```
+
+---
+
+## Claude Desktop Integration
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
@@ -73,13 +134,13 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
-### Claude Code Integration
+---
 
-For [Claude Code](https://github.com/anthropics/claude-code) AI coding assistant, you have two options:
+## Claude Code Integration
 
-#### Option 1: Using .mcp.json (Recommended)
+### Option 1: Project‑specific `.mcp.json` (Recommended)
 
-1. Create a `.mcp.json` file in your project root:
+Drop this in your project root:
 
 ```json
 {
@@ -95,111 +156,111 @@ For [Claude Code](https://github.com/anthropics/claude-code) AI coding assistant
 }
 ```
 
-2. Claude Code will automatically detect and use this MCP server when you open the project.
+Claude Code auto‑detects and loads it. ✨
 
-#### Option 2: Global Configuration
+### Option 2: Global Config
 
-Add to your global Claude Code settings (`~/.config/claude-code/settings.json`):
+Add to `~/.config/claude-code/settings.json` for system‑wide access.
 
-```json
-{
-  "mcpServers": {
-    "ai-image-gen": {
-      "command": "/path/to/ai-image-gen-mcp/.venv/bin/python",
-      "args": ["-m", "ai_image_gen_mcp.server", "stdio"],
-      "transport": "STDIO",
-      "env": {
-        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src",
-        "OPENAI_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
+---
+
+## Model Capabilities
+
+| Model         | Sizes                                    | Styles         | Batch (n) | Speed      | Notes                          |
+| ------------- | ---------------------------------------- | -------------- | --------- | ---------- | ------------------------------ |
+| **DALL·E 3**  | 1024×1024, 1792×1024, 1024×1792         | vivid, natural | 1         | Fast       | Best quality, default model    |
+| **DALL·E 2**  | 256×256, 512×512, 1024×1024            | N/A            | 1-10      | Fast       | Good for variations            |
+| **GPT‑Image‑1** | Fixed (model‑determined)               | N/A            | 1         | Slow (20s+) | Experimental, may timeout      |
+
+---
+
+## Usage Examples
+
+### Basic Generation
+```
+Generate a minimalist logo for a productivity app
 ```
 
-**Note**: If using a virtual environment, ensure you use the full path to the Python executable within the `.venv` directory.
-
-## Usage
-
-### In Claude Desktop
-
-After configuration, you can use the image generation tools:
-
+### With Parameters
 ```
-Generate an image of a serene mountain landscape at sunset
+Create a vivid 1792x1024 banner of a futuristic cityscape using dall-e-3
 ```
 
-Claude will use the `generate_image` tool to create your image.
+### Batch Creation
+```
+Generate 5 variations of a coffee cup product photo using dall-e-2
+```
 
-### Available Models
-
-- **DALL-E 3** (default): Best quality, supports custom sizes and styles
-- **DALL-E 2**: Previous generation, supports batch generation
-- **GPT-Image-1**: Experimental multimodal model
-
-### Prompt Templates
-
-The server includes built-in prompt templates:
-
-- `product_mockup`: Professional product photography prompts
-- `concept_art`: Artistic concept generation prompts
-
-## Troubleshooting
-
-### Claude Code Integration Issues
-
-1. **MCP server not detected**: Ensure `.mcp.json` is in the project root directory
-2. **API key errors**: Verify your OpenAI API key is correctly set in the environment
-3. **Python path issues**: Use absolute paths to your virtual environment's Python executable
-4. **Module not found**: Ensure `PYTHONPATH` includes the `src` directory
+---
 
 ## Development
 
-### Running Tests
-
+### Testing
 ```bash
-pytest                    # Run all tests
-pytest --cov             # With coverage
-python test_dalle.py     # Test actual image generation
+pytest                           # Full suite
+pytest --cov=ai_image_gen_mcp   # Coverage report
+python test_dalle.py            # Live API test
 ```
 
 ### Code Quality
-
 ```bash
-black src/               # Format code
-ruff check src/         # Lint
-mypy src/               # Type check
+black src/        # Format
+ruff check src/   # Lint
+mypy src/         # Type check
 ```
 
-## Configuration
+### Project Structure
+```
+ai-image-gen-mcp/
+├── src/ai_image_gen_mcp/
+│   ├── server.py          # FastMCP server entry
+│   ├── models/            # Model implementations
+│   └── config.py          # Environment config
+├── tests/                 # Comprehensive test suite
+├── assets/                # Logo images
+└── .mcp.json             # Claude Code config
+```
 
-Key environment variables:
+---
 
-- `OPENAI_API_KEY`: Your OpenAI API key (required)
-- `MODEL_DEFAULT`: Default model ID (default: gpt-4.1-mini)
-- `MODEL_PROVIDER`: Provider name (default: openai)
-- `CACHE_DIR`: Image storage directory (default: /tmp/ai-image-gen-cache)
-- `LOG_LEVEL`: Logging level (default: INFO)
+## Troubleshooting
 
-## Architecture
+| Issue                        | Solution                                                    |
+| ---------------------------- | ----------------------------------------------------------- |
+| **MCP not detected**         | Ensure `.mcp.json` exists in project root                 |
+| **API key errors**           | Check `OPENAI_API_KEY` in `.env` or environment           |
+| **Import errors**            | Verify `PYTHONPATH` includes `src/` directory             |
+| **GPT‑Image‑1 timeouts**     | Known issue – use DALL·E models for reliability           |
+| **Claude Desktop issues**    | Use full paths to venv Python executable                  |
 
-The server follows a modular architecture:
+---
 
-1. **MCP Server**: FastMCP-based server handling JSON-RPC protocol
-2. **Model Router**: Strategy pattern for model selection
-3. **Storage Layer**: Local filesystem with metadata tracking
-4. **Model Implementations**: Separate classes for each AI model
+## Roadmap
+
+| Version | Focus                                          | Status       |
+| ------- | ---------------------------------------------- | ------------ |
+| **0.1** | MVP with 3 models, local storage              | ✅ Shipped   |
+| **0.2** | S3/GCS storage, signed URLs                   | 🚧 Planning  |
+| **0.3** | Stable Diffusion, ComfyUI integration         | 📋 Backlog   |
+| **0.4** | Inpainting, upscaling, style transfer         | 💭 Ideas     |
+
+---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+Fork → feature branch → PR. Run `pre-commit` hooks. Keep the vibe technical but approachable.
+
+---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+**MIT** – see [LICENSE](LICENSE).
 
-## Acknowledgments
+---
 
-- Built with [FastMCP](https://github.com/jlowin/fastmcp)
-- Uses OpenAI's DALL-E and GPT-Image models
-- Implements the [Model Context Protocol](https://modelcontextprotocol.io/)
+## Links
+
+* **MCP Docs** – [modelcontextprotocol.io](https://modelcontextprotocol.io/)
+* **FastMCP** – [github.com/jlowin/fastmcp](https://github.com/jlowin/fastmcp)
+* **OpenAI Images** – [platform.openai.com/docs/guides/images](https://platform.openai.com/docs/guides/images)
+* **Issues** – [github.com/krystian-ai/ai-image-gen-mcp/issues](https://github.com/krystian-ai/ai-image-gen-mcp/issues)
