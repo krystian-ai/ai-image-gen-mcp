@@ -14,10 +14,10 @@ class ImageGenerationRequest(BaseModel):
         min_length=1,
         max_length=4000,
     )
-    style: Literal["default", "photorealistic", "illustration"] | None = Field(
+    style: str | None = Field(
         default="default", description="Style preset for image generation"
     )
-    size: Literal["1024x1024", "1792x1024", "1024x1792"] | None = Field(
+    size: str | None = Field(
         default="1024x1024", description="Image dimensions"
     )
     n: int | None = Field(
@@ -35,3 +35,4 @@ class ImageGenerationResponse(BaseModel):
     prompt: str = Field(..., description="The prompt used for generation")
     model: str = Field(..., description="Model used for generation")
     created_at: str = Field(..., description="ISO 8601 timestamp of generation")
+    message: str | None = Field(None, description="User-friendly message about the result")

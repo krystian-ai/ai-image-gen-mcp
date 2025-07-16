@@ -53,8 +53,19 @@ class DALLEModel(ImageGenerationModel):
         # Set defaults
         if size is None:
             size = "1024x1024"
-        if style is None and self.model == "dall-e-3":
-            style = "vivid"
+        
+        # Handle style parameter
+        if self.model == "dall-e-3":
+            if style is None:
+                style = "vivid"
+            elif style not in ["vivid", "natural"]:
+                # Map common style requests to valid DALL-E 3 styles
+                original_style = style
+                if style in ["photorealistic", "realistic", "photo"]:
+                    style = "natural"
+                else:
+                    style = "vivid"  # Default for unknown styles
+                logger.info(f"Mapped style '{original_style}' to '{style}' for DALL-E 3")
 
         try:
             # Build params
@@ -176,8 +187,6 @@ class DALLEModel(ImageGenerationModel):
                 return False
 
         # Check style for DALL-E 3
-        if self.model == "dall-e-3" and style:
-            if style not in ["vivid", "natural"]:
-                return False
+        # Note: We now handle style mapping in generate(), so any style is valid
 
         return True
