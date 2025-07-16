@@ -1,5 +1,9 @@
 # AI Image Generation MCP Server
 
+<p align="center">
+  <img src="assets/logo.png" alt="AI Image Generation MCP Server Logo" width="400">
+</p>
+
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -68,6 +72,52 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
+### Claude Code Integration
+
+For [Claude Code](https://github.com/anthropics/claude-code) AI coding assistant, you have two options:
+
+#### Option 1: Using .mcp.json (Recommended)
+
+1. Create a `.mcp.json` file in your project root:
+
+```json
+{
+  "ai-image-gen": {
+    "command": "python",
+    "args": ["-m", "ai_image_gen_mcp.server", "stdio"],
+    "transport": "STDIO",
+    "env": {
+      "PYTHONPATH": "src",
+      "OPENAI_API_KEY": "your-api-key-here"
+    }
+  }
+}
+```
+
+2. Claude Code will automatically detect and use this MCP server when you open the project.
+
+#### Option 2: Global Configuration
+
+Add to your global Claude Code settings (`~/.config/claude-code/settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "ai-image-gen": {
+      "command": "/path/to/ai-image-gen-mcp/.venv/bin/python",
+      "args": ["-m", "ai_image_gen_mcp.server", "stdio"],
+      "transport": "STDIO",
+      "env": {
+        "PYTHONPATH": "/path/to/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+**Note**: If using a virtual environment, ensure you use the full path to the Python executable within the `.venv` directory.
+
 ## Usage
 
 ### In Claude Desktop
@@ -92,6 +142,15 @@ The server includes built-in prompt templates:
 
 - `product_mockup`: Professional product photography prompts
 - `concept_art`: Artistic concept generation prompts
+
+## Troubleshooting
+
+### Claude Code Integration Issues
+
+1. **MCP server not detected**: Ensure `.mcp.json` is in the project root directory
+2. **API key errors**: Verify your OpenAI API key is correctly set in the environment
+3. **Python path issues**: Use absolute paths to your virtual environment's Python executable
+4. **Module not found**: Ensure `PYTHONPATH` includes the `src` directory
 
 ## Development
 

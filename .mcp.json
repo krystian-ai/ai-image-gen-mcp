@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ai-image-gen": {
+      "command": "${HOME}/Sources/projects-ai/ai-image-gen-mcp/.venv/bin/python",
+      "args": [
+        "-m",
+        "ai_image_gen_mcp.server",
+        "stdio"
+      ],
+      "env": {
+        "PYTHONPATH": "${HOME}/Sources/projects-ai/ai-image-gen-mcp/src",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      }
+    }
+  }
+}
