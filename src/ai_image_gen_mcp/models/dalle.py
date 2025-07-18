@@ -98,7 +98,7 @@ class DALLEModel(ImageGenerationModel):
             if params.get("style"):
                 api_kwargs["style"] = params["style"]
 
-            response = await self.client.images.generate(**api_kwargs)  # type: ignore[arg-type]
+            response = await self.client.images.generate(**api_kwargs)  # type: ignore
 
             # Extract image data
             image_data_list = []
