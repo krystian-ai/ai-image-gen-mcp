@@ -84,14 +84,21 @@ class DALLEModel(ImageGenerationModel):
                 params["style"] = style
 
             # Call the Images API
-            response = await self.client.images.generate(
-                prompt=str(params["prompt"]),
-                model=str(params["model"]),
-                n=params["n"],  # type: ignore
-                size=params.get("size") if params.get("size") else None,  # type: ignore
-                response_format=params["response_format"],  # type: ignore
-                style=params.get("style") if params.get("style") else None,  # type: ignore
-            )
+            # Build kwargs for the API call
+            api_kwargs = {
+                "prompt": str(params["prompt"]),
+                "model": str(params["model"]),
+                "n": params["n"],
+                "response_format": params["response_format"],
+            }
+
+            # Add optional parameters
+            if params.get("size"):
+                api_kwargs["size"] = params["size"]
+            if params.get("style"):
+                api_kwargs["style"] = params["style"]
+
+            response = await self.client.images.generate(**api_kwargs)  # type: ignore[arg-type]
 
             # Extract image data
             image_data_list = []
