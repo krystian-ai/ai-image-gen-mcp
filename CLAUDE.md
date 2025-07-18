@@ -131,3 +131,7 @@ mypy src/
 1. GPT-Image-1 responses can take 20+ seconds, may timeout
 2. Claude Desktop integration requires full venv path
 3. OPENAI_API_KEY must be set in environment or .env file
+
+## Development Best Practices
+
+- run all CI tests locally before commiting changes.

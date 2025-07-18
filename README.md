@@ -193,6 +193,28 @@ Generate 5 variations of a coffee cup product photo using dall-e-2
 
 ---
 
+## Interactive HTML Demo
+
+Explore the server's capabilities through our interactive web interface:
+
+```bash
+cd examples/html
+open index.html  # macOS
+# or
+xdg-open index.html  # Linux
+# or just open in your browser
+```
+
+The demo showcases:
+* **Live Examples** – Generated images with their prompts
+* **Model Comparison** – See outputs from DALL·E 3, DALL·E 2, and GPT-Image-1
+* **Interactive Gallery** – Carousel of stunning AI-generated artwork
+* **Integration Guide** – How to connect with Claude Desktop/Code
+
+Perfect for visualizing what's possible before diving into the API!
+
+---
+
 ## Development
 
 ### Testing
@@ -217,6 +239,8 @@ ai-image-gen-mcp/
 │   ├── models/            # Model implementations
 │   └── config.py          # Environment config
 ├── tests/                 # Comprehensive test suite
+├── examples/
+│   └── html/              # Interactive web demo
 ├── assets/                # Logo images
 └── .mcp.json             # Claude Code config
 ```
