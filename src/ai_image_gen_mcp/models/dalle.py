@@ -53,7 +53,7 @@ class DALLEModel(ImageGenerationModel):
         # Set defaults
         if size is None:
             size = "1024x1024"
-        
+
         # Handle style parameter
         if self.model == "dall-e-3":
             if style is None:
@@ -65,7 +65,9 @@ class DALLEModel(ImageGenerationModel):
                     style = "natural"
                 else:
                     style = "vivid"  # Default for unknown styles
-                logger.info(f"Mapped style '{original_style}' to '{style}' for DALL-E 3")
+                logger.info(
+                    f"Mapped style '{original_style}' to '{style}' for DALL-E 3"
+                )
 
         try:
             # Build params

@@ -57,7 +57,7 @@ async def generate_image(
     # Ensure model_router is initialized
     if model_router is None:
         raise RuntimeError("Server not initialized. Please restart the MCP server.")
-    
+
     # Get model (use specified model or default)
     try:
         selected_model = model_router.get_model(model)
@@ -66,7 +66,7 @@ async def generate_image(
     except ValueError as e:
         logger.warning(f"Model '{model}' not found, using default")
         selected_model = model_router.get_model()
-    
+
     model = selected_model
 
     # Validate parameters for the model
@@ -115,60 +115,60 @@ async def generate_image(
         prompt=request.prompt,
         model=model.get_model_info()["model_id"],
         created_at=datetime.utcnow().isoformat(),
-        message=message
+        message=message,
     )
 
     logger.info(f"Successfully generated {len(image_urls)} image(s)")
-    
+
     # Add a helpful message about the image location
     if image_urls:
         logger.info(f"Image saved at: {image_urls[0]}")
-    
+
     return response
 
 
 @mcp.resource("images://{path}")
 async def get_image(path: str) -> dict:
     """Serve an image file as a resource.
-    
+
     Args:
         path: Path to the image file
-        
+
     Returns:
         Image data as base64 with metadata
     """
     import base64
     from pathlib import Path
-    
+
     try:
         image_path = Path(path.replace("images://", ""))
-        
+
         if not image_path.exists():
             return {"error": f"Image not found: {image_path}"}
-        
+
         # Read image data
         with open(image_path, "rb") as f:
             image_data = f.read()
-        
+
         # Convert to base64
-        base64_data = base64.b64encode(image_data).decode('utf-8')
-        
+        base64_data = base64.b64encode(image_data).decode("utf-8")
+
         # Determine MIME type
         suffix = image_path.suffix.lower()
         mime_types = {
             ".png": "image/png",
             ".jpg": "image/jpeg",
             ".jpeg": "image/jpeg",
-            ".webp": "image/webp"
+            ".webp": "image/webp",
         }
         mime_type = mime_types.get(suffix, "image/png")
-        
+
         return {
             "type": "image",
             "data": f"data:{mime_type};base64,{base64_data}",
             "path": str(image_path),
             "size": len(image_data),
-            "mime_type": mime_type
+            "mime_type": mime_type,
         }
     except Exception as e:
         logger.error(f"Failed to serve image: {e}")
