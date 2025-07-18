@@ -63,7 +63,7 @@ async def generate_image(
         selected_model = model_router.get_model(model)
         if model:
             logger.info(f"Using specified model: {model}")
-    except ValueError as e:
+    except ValueError:
         logger.warning(f"Model '{model}' not found, using default")
         selected_model = model_router.get_model()
 

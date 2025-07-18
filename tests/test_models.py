@@ -1,8 +1,10 @@
 """Tests for model implementations."""
 
-import pytest
 import base64
 from unittest.mock import AsyncMock, patch
+
+import pytest
+
 from ai_image_gen_mcp.models.gpt_image import GPTImageModel
 
 

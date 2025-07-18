@@ -1,7 +1,9 @@
 """Tests for the MCP server implementation."""
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
+
 from ai_image_gen_mcp.server import generate_image
 from ai_image_gen_mcp.types import ImageGenerationResponse
 
