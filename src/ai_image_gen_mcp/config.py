@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -45,20 +46,23 @@ class Config(BaseModel):
     debug: bool = Field(default=False, description="Debug mode")
 
     @field_validator("cache_dir", mode="before")
-    def expand_cache_dir(cls, v):
+    def expand_cache_dir(cls, v: Any) -> Path:
         """Expand cache directory path."""
         if isinstance(v, str):
-            v = Path(v).expanduser().resolve()
-        return v
+            return Path(v).expanduser().resolve()
+        elif isinstance(v, Path):
+            return v.expanduser().resolve()
+        else:
+            return Path(str(v)).expanduser().resolve()
 
     @field_validator("openai_api_key")
-    def validate_api_key(cls, v):
+    def validate_api_key(cls, v: str) -> str:
         """Validate OpenAI API key format."""
         if not v or not v.startswith("sk-"):
             raise ValueError("Invalid OpenAI API key format")
         return v
 
-    model_config = ConfigDict(case_sensitive=False, env_prefix="")
+    model_config = ConfigDict()
 
 
 def load_config(env_file: Path | None = None) -> Config:
@@ -70,17 +74,15 @@ def load_config(env_file: Path | None = None) -> Config:
         load_dotenv(env_file)
 
     # Load from environment variables
-    config_data = {
-        "openai_api_key": os.getenv("OPENAI_API_KEY", ""),
-        "model_default": os.getenv("MODEL_DEFAULT", "gpt-4.1-mini"),
-        "model_provider": os.getenv("MODEL_PROVIDER", "openai"),
-        "cache_dir": os.getenv("CACHE_DIR", "/tmp/ai-image-gen-cache"),
-        "storage_type": os.getenv("STORAGE_TYPE", "local"),
-        "server_name": os.getenv("SERVER_NAME", "AI Image Generation MCP Server"),
-        "server_version": os.getenv("SERVER_VERSION", "0.1.0"),
-        "log_level": os.getenv("LOG_LEVEL", "INFO"),
-        "rate_limit_rpm": int(os.getenv("RATE_LIMIT_RPM", "60")),
-        "debug": os.getenv("DEBUG", "false").lower() == "true",
-    }
-
-    return Config(**config_data)
+    return Config(
+        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+        model_default=os.getenv("MODEL_DEFAULT", "gpt-4.1-mini"),
+        model_provider=os.getenv("MODEL_PROVIDER", "openai"),
+        cache_dir=Path(os.getenv("CACHE_DIR", "/tmp/ai-image-gen-cache")),
+        storage_type=os.getenv("STORAGE_TYPE", "local"),
+        server_name=os.getenv("SERVER_NAME", "AI Image Generation MCP Server"),
+        server_version=os.getenv("SERVER_VERSION", "0.1.0"),
+        log_level=os.getenv("LOG_LEVEL", "INFO"),
+        rate_limit_rpm=int(os.getenv("RATE_LIMIT_RPM", "60")),
+        debug=os.getenv("DEBUG", "false").lower() == "true",
+    )

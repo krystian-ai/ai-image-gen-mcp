@@ -32,7 +32,7 @@ class DALLEModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs,
+        **kwargs: Any,
     ) -> list[bytes]:
         """Generate images using DALL-E.
 
@@ -84,18 +84,26 @@ class DALLEModel(ImageGenerationModel):
                 params["style"] = style
 
             # Call the Images API
-            response = await self.client.images.generate(**params)
+            response = await self.client.images.generate(
+                prompt=str(params["prompt"]),
+                model=str(params["model"]),
+                n=params["n"],  # type: ignore
+                size=params.get("size") if params.get("size") else None,  # type: ignore
+                response_format=params["response_format"],  # type: ignore
+                style=params.get("style") if params.get("style") else None,  # type: ignore
+            )
 
             # Extract image data
             image_data_list = []
-            for image in response.data:
-                if image.b64_json:
-                    # Decode base64 data
-                    image_bytes = base64.b64decode(image.b64_json)
-                    image_data_list.append(image_bytes)
-                else:
-                    # Should not happen with b64_json format
-                    raise ValueError("No base64 data in response")
+            if response.data:
+                for image in response.data:
+                    if image.b64_json:
+                        # Decode base64 data
+                        image_bytes = base64.b64decode(image.b64_json)
+                        image_data_list.append(image_bytes)
+                    else:
+                        # Should not happen with b64_json format
+                        raise ValueError("No base64 data in response")
 
             return image_data_list
 
@@ -152,7 +160,7 @@ class DALLEModel(ImageGenerationModel):
         size: str | None = None,
         style: str | None = None,
         n: int = 1,
-        **kwargs,
+        **kwargs: Any,
     ) -> bool:
         """Validate parameters for DALL-E.
 

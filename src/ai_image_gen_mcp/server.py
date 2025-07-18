@@ -2,7 +2,8 @@
 
 import logging
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
+from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 
@@ -24,9 +25,9 @@ logger = logging.getLogger(__name__)
 mcp = FastMCP("AI Image Generation MCP Server")
 
 # Global instances (will be initialized in main)
-config = None
-model_router = None
-storage = None
+config: Any = None
+model_router: ModelRouter | None = None
+storage: LocalStorage | None = None
 
 
 @mcp.tool()
@@ -58,7 +59,6 @@ async def generate_image(
     if model_router is None:
         raise RuntimeError("Server not initialized. Please restart the MCP server.")
 
-    # Get model (use specified model or default)
     try:
         selected_model = model_router.get_model(model)
         if model:
@@ -67,18 +67,19 @@ async def generate_image(
         logger.warning(f"Model '{model}' not found, using default")
         selected_model = model_router.get_model()
 
-    model = selected_model
-
     # Validate parameters for the model
-    if not await model.validate_parameters(
-        prompt=request.prompt, size=request.size, style=request.style, n=request.n
+    if not await selected_model.validate_parameters(
+        prompt=request.prompt, size=request.size, style=request.style, n=request.n or 1
     ):
         raise ValueError("Invalid parameters for selected model")
 
     # Generate images
     try:
-        image_data_list = await model.generate(
-            prompt=request.prompt, size=request.size, style=request.style, n=request.n
+        image_data_list = await selected_model.generate(
+            prompt=request.prompt,
+            size=request.size,
+            style=request.style,
+            n=request.n or 1,
         )
     except Exception as e:
         logger.error(f"Model generation failed: {e}")
@@ -92,9 +93,12 @@ async def generate_image(
             "prompt": request.prompt,
             "style": request.style,
             "size": request.size,
-            "model": model.get_model_info()["model_id"],
-            "created_at": datetime.utcnow().isoformat(),
+            "model": selected_model.get_model_info()["model_id"],
+            "created_at": datetime.now(UTC).isoformat(),
         }
+
+        if storage is None:
+            raise RuntimeError("Storage not initialized")
 
         try:
             url = await storage.save(image_data, filename, metadata)
@@ -113,8 +117,8 @@ async def generate_image(
     response = ImageGenerationResponse(
         image_urls=image_urls,
         prompt=request.prompt,
-        model=model.get_model_info()["model_id"],
-        created_at=datetime.utcnow().isoformat(),
+        model=selected_model.get_model_info()["model_id"],
+        created_at=datetime.now(UTC).isoformat(),
         message=message,
     )
 
@@ -182,6 +186,8 @@ async def list_models() -> dict:
     Returns:
         Dictionary containing available models and their capabilities
     """
+    if model_router is None:
+        return {"models": [], "default": None}
     return {"models": model_router.list_models(), "default": model_router.default_model}
 
 

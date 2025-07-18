@@ -72,7 +72,7 @@ class ModelRouter:
         ]
 
     @classmethod
-    def create_default_router(cls, config) -> "ModelRouter":
+    def create_default_router(cls, config: Any) -> "ModelRouter":
         """Create router with default model configuration.
 
         Args:
