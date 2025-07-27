@@ -1,0 +1,29 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'mcp-imageserve', args: ['stdio'], env: { OPENAI_API_KEY: config.openaiApiKey, MODEL_DEFAULT: config.modelDefault, CACHE_DIR: config.cacheDir } })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - openaiApiKey
+    properties:
+      openaiApiKey:
+        type: string
+        description: OpenAI API key for accessing image generation models
+      modelDefault:
+        type: string
+        default: gpt-4.1-mini
+        description: Default model to use (e.g., dall-e-3, dalle-2, gpt-image-1)
+      cacheDir:
+        type: string
+        default: /tmp/ai-image-gen-cache
+        description: Directory for storing generated images
+  exampleConfig:
+    openaiApiKey: sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    modelDefault: dall-e-3
+    cacheDir: /tmp/ai-image-gen-cache
