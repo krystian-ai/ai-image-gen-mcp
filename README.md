@@ -8,6 +8,7 @@
   <img src="assets/logo-gpt.png" alt="AI Image Generation MCP Server Logo (GPT-Image-1)" width="400">
 </p>
 
+[![smithery badge](https://smithery.ai/badge/@krystian-ai/ai-image-gen-mcp)](https://smithery.ai/server/@krystian-ai/ai-image-gen-mcp)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -78,6 +79,14 @@ graph TD
 * **Python 3.11+**
 * **OpenAI API key**
 * **Claude Desktop** or **Claude Code** (for MCP integration)
+
+### Installing via Smithery
+
+To install ai-image-gen-mcp for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@krystian-ai/ai-image-gen-mcp):
+
+```bash
+npx -y @smithery/cli install @krystian-ai/ai-image-gen-mcp --client claude
+```
 
 ### Installation
 
